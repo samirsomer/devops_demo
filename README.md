@@ -92,6 +92,40 @@ helm install devops-demo helm/devops-demo-app \
   --set autoscaling.enabled=false --set replicaCount=1
 ```
 
+## Monitoring
+
+The app exposes Prometheus metrics at `/metrics` (see above). A
+`ServiceMonitor` for it lives in `k8s/monitoring/`, so it can be scraped by
+any Prometheus Operator-based stack — e.g.
+[kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack),
+which also bundles Grafana:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
+
+kubectl apply -f k8s/monitoring/namespace.yml
+kubectl apply -f k8s/monitoring/servicemonitor.yml
+```
+
+The `serviceMonitorSelectorNilUsesHelmValues=false` flag tells Prometheus to
+discover `ServiceMonitor`s in any namespace regardless of labels — by
+default it only watches ones labeled with its own Helm release name.
+
+The `ServiceMonitor` selects the app's `Service` by the `app: devops-demo`
+label and its `http`-named port, both of which are already set on
+`k8s/service.yml` and on the Helm chart's `service.yml` template.
+
+Once applied, confirm Prometheus is scraping the app under
+**Status > Targets** in the Prometheus UI, and log into Grafana (default
+credentials come from the chart's `admin-password` secret) to build
+dashboards from metrics like `http_requests_total` and
+`http_request_duration_seconds_bucket`.
+
 ## Configuration
 
 All settings are environment variables prefixed with `DEMO_APP_` (see

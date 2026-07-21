@@ -17,3 +17,6 @@ htmlcov/
 # Helm
 helm/**/charts/*.tgz
 helm/**/Chart.lock
+
+# Local notes
+steps.txt
