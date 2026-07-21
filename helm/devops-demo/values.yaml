@@ -6,7 +6,7 @@ microservice:
 
 image:
   repository: samirsomer/devops-demo-app
-  tag: "20260721-1351671"
+  tag: "20260721-d5b3c47"
   pullPolicy: IfNotPresent
 
 
