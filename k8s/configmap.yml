@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: devops-demo-config
+  namespace: devops-demo
+
+data:
+  DEMO_APP_APP_NAME: "DevOps Demo"
+  DEMO_APP_LOG_LEVEL: "INFO"
+  DEMO_APP_ENVIRONMENT: "development"

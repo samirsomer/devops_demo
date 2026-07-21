@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "devops-demo.fullname" . }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  selector:
+    matchLabels:
+      app: {{ include "devops-demo.fullname" . }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ include "devops-demo.fullname" . }}
+
+    spec:
+      containers:
+      - name: {{ include "devops-demo.fullname" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+
+        envFrom:
+        - configMapRef:
+            name: {{ include "devops-demo.fullname" . }}-config
+
+        
+
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

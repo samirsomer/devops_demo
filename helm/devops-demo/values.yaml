@@ -1,0 +1,36 @@
+
+replicaCount: 2
+
+microservice:
+  name: devops-demo
+
+image:
+  repository: samirsomer/devops-demo-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+
+service:
+  type: ClusterIP
+  port: 8008
+  targetPort: 8000
+
+
+ingress:
+  enabled: true
+  className: nginx
+  host: devops-demo.local
+
+
+config:
+  appName: DevOps Demo
+  logLevel: INFO
+  environment: development
+
+
+
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70

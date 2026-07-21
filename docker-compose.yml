@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      DEMO_APP_ENVIRONMENT: local
+      DEMO_APP_LOG_JSON: "true"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
